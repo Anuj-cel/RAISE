@@ -39,7 +39,7 @@ export default function ForgetPassword() {
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition"
           >
-            Send Reset Link
+            Send OTP
           </button>
         </form>
 

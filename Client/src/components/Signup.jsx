@@ -6,6 +6,9 @@ export default function Signup() {
     surname: "",
     email: "",
     password: "",
+    mobile: "",
+    room: "",
+    hostel: "",
   });
 
   const handleChange = (e) => {
@@ -83,6 +86,54 @@ export default function Signup() {
               required
             />
           </div>
+
+          {/* Mobile Number */}
+          <label className="block text-gray-700 mb-1">PH.No.</label>
+          <input
+            type="tel"
+            name="mobile"
+            placeholder="Mobile Number"
+            value={formData.mobile}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          />
+
+          {/* Room Number */}
+          <label className="block text-gray-700 mb-1">Room No.</label>
+          <input
+            type="text"
+            name="room"
+            placeholder="Room Number"
+            value={formData.room}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          />
+
+          {/* Hostel Name Dropdown */}
+          <label className="block text-gray-700 mb-1">Hostel Name</label>
+          <select
+            name="hostel"
+            value={formData.hostel}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          >
+            <option value="">Select Hostel</option>
+            <option value="Hostel A">Hostel A</option>
+            <option value="Hostel B">Hostel B</option>
+            <option value="Hostel C">Hostel C</option>
+            <option value="Hostel D">Hostel D</option>
+            <option value="Hostel E">Hostel E</option>
+            <option value="Hostel F">Hostel F</option>
+            <option value="Hostel G">Hostel G</option>
+            <option value="Hostel H">Hostel H</option>
+            <option value="Hostel I">Hostel I</option>
+            <option value="Hostel J">Hostel J</option>
+            <option value="Hostel K">Hostel K</option>
+            <option value="Hostel L">Hostel L</option>
+          </select>
 
           {/* Submit Button */}
           <button

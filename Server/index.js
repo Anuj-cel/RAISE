@@ -1,9 +1,8 @@
 dotenv.config();
 import express from "express";
 import dotenv from "dotenv";
-import authRoutes from "./src/routes/authRoutes.js";
+import authRoutes from "./src/routes/auth.Routes.js";
 import mongoose from "mongoose";
-
 
 
 const connectDB = async () => {

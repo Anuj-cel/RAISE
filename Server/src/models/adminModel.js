@@ -1,15 +1,12 @@
 import mongoose from "mongoose";
 
 const adminSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-
-  // Authentication
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-
+  user: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true}, // login 
+  
   // Admin details
-  employeeId: { type: String, required: true, unique: true },
-  designation: { type: String,required:true }, // Dean, Hostel Coordinator, System Admin, etc.
+  staffId: { type: String, required: true, unique: true }, // Official staff ID
+  designation: { type: String, enum: ["chief warden","warden","supervisor","system admin"], required:true }, // Hostel Coordinator, System Admin.
+  hostelName: { type: String, enum:["A","B","C","D","E","F","G","H","I","J","K","L"], default: null, required: true }, // Hostel they manage
 
   phoneNumber: { type: String,required:true },
 }, { timestamps: true });

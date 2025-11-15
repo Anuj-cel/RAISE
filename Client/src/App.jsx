@@ -15,7 +15,7 @@ import AdminLogin from "./components/AdminLogin";
 function App() {
    const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [role, setRole] = useState("student"); // "student" | "admin"
-  const token = localStorage.getItem("token");
+  
     const handleLogout = () => {
     setIsAuthenticated(false);
     setRole(null);

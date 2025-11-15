@@ -14,7 +14,7 @@ export const authoriseUser = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRETKEY);
 
     // decoded should have 'id' and 'role' because you signed the token with these fields
-    const { id, role,staffId,registrationId } = decoded;
+    const { role, staffId, registrationId } = decoded;
 
     // You can add role check here if needed, e.g. allow only student/admin
     if (role !== "student" && role !== "admin") {
@@ -22,9 +22,12 @@ export const authoriseUser = async (req, res, next) => {
     }
 
     // Attach user info to request object
-    req.user = { id, role,staffId,registrationId };
+    if(role==="student")
+      req.user = { role, registrationId };
+    else if(role==="admin")
+      req.user = { role, staffId };
 
-    next(); // proceed to next middleware or route handler
+    next();
 
   } catch (err) {
     return res.status(401).json({ message: "Token invalid or expired" });

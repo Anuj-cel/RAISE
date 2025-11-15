@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
 
 const grievanceSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "Student", required: true },
+  registrationId: { type: String, required: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
   images: [
     { link: { type: String } }
   ],
-  status: { type: String, enum: ["pending","running", "done"], default: "pending" },
+  status: { type: String, enum: ["pending","running", "completed"], default: "pending" },
   category: { 
     type: String, 
     enum: ["cleanliness", "security", "maintenance", "mess", "internet","other"], 

@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const MyGrievances = ({ token }) => {
   const [grievances, setGrievances] = useState([]);
+  const navigate=useNavigate();
 
   const fetchGrievances = async () => {
     try {
+      const token = localStorage.getItem("token");
       if (!token) {
         alert("Please login first!");
+        navigate('login/student');
         return;
       }
 

@@ -10,18 +10,17 @@ import Student from "./src/models/studentModel.js";
 import Admin from "./src/models/adminModel.js";
 import Grievance from "./src/models/grievance.js";
 import { authoriseUser } from "./src/middleware/auth.middleware.js";
-import multer from "multer";
 import path from "path";
 import { upload } from "./src/middleware/upload.js";
+
 //import routes
-import {authRoutes} from "./src/routes/authRoutes.js";
 const app = express();
 app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-mongoose.connect("mongodb://localhost:27017/grievancePortal")
+mongoose.connect(`${process.env.MONGO_URI}`)
 .then(() => console.log("✅ MongoDB connected"))
 .catch(err => console.error(err));
 
@@ -53,9 +52,9 @@ app.post("/register/student", async (req, res) => {
       return res.status(400).json({ message: "Missing student fields" });
     }
 
-    const existing = await Student.findOne({ personalEmail });
+    const existing = await Student.findOne({ registrationId });
     if (existing)
-      return res.status(400).json({ message: "Email already registered" });
+      return res.status(400).json({ message: "Student already registered" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -71,10 +70,10 @@ app.post("/register/student", async (req, res) => {
       password: hashedPassword,
     });
 
-    res.status(201).json({ message: "Student registered successfully", student });
+    return res.status(201).json({ message: "Student registered successfully", student });
   } catch (err) {
     console.error("Student register error:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -82,8 +81,8 @@ app.post("/register/student", async (req, res) => {
 app.post("/register/admin", async (req, res) => {
   try {
     const {
-      name,
       staffId,
+      name,
       designation,
       hostelName,
       phoneNumber,
@@ -103,26 +102,26 @@ app.post("/register/admin", async (req, res) => {
       return res.status(400).json({ message: "Missing admin fields" });
     }
  
-    const existing = await Admin.findOne({ email });
+    const existing = await Admin.findOne({ staffId });
     if (existing)
-      return res.status(400).json({ message: "Email already registered" });
+      return res.status(400).json({ message: "Staff already registered" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const admin = await Admin.create({
-      name,
       staffId,
+      name,
       designation,
       hostelName,
-      phoneNumber,
       email,
+      phoneNumber,
       password: hashedPassword,
     });
 
-    res.status(201).json({ message: "Admin registered successfully", admin });
+    return res.status(201).json({ message: "Staff registered successfully", admin });
   } catch (err) {
     console.error("Admin register error:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -131,6 +130,9 @@ app.post("/register/admin", async (req, res) => {
 app.post("/login/student", async (req, res) => {
   try {
     const { registrationId, password } = req.body;
+    if(!registrationId || !password)
+      return res.status(400).json({message : "Incorrect username or password"});
+
     const student = await Student.findOne({ registrationId: registrationId.toLowerCase().trim() });
 
     if (!student)
@@ -138,15 +140,15 @@ app.post("/login/student", async (req, res) => {
 
     const ok = await bcrypt.compare(password, student.password);
     if (!ok)
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Wrong Password" });
 
     const token = jwt.sign(
-      { id: student._id, role: "student", registrationId: student.registrationId },
+      { role: "student", registrationId: student.registrationId },
       process.env.JWT_SECRETKEY,
       { expiresIn: "1h" }
     );
 
-    return res.json({
+    return res.status(201).json({
       message: "Login successful",
       token,
       role: "student",
@@ -154,7 +156,7 @@ app.post("/login/student", async (req, res) => {
     });
   } catch (err) {
     console.error("Student login error:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -162,6 +164,9 @@ app.post("/login/student", async (req, res) => {
 app.post("/login/admin", async (req, res) => {
   try {
     const { staffId, password } = req.body;
+    if(!staffId || !password)
+      return res.status(400).json({message : "Incorrect staffId or password"});
+
     const admin = await Admin.findOne({ staffId });
 
     if (!admin)
@@ -169,15 +174,15 @@ app.post("/login/admin", async (req, res) => {
 
     const ok = await bcrypt.compare(password, admin.password);
     if (!ok)
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Wrong password" });
 
     const token = jwt.sign(
-      { id: admin._id, role: "admin", staffId: admin.staffId },
+      { role: "admin", staffId: admin.staffId },
       process.env.JWT_SECRETKEY,
       { expiresIn: "1h" }
     );
 
-    return res.json({
+    return res.status(201).json({
       message: "Login successful",
       token,
       role: "admin",
@@ -185,60 +190,77 @@ app.post("/login/admin", async (req, res) => {
     });
   } catch (err) {
     console.error("Admin login error:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
+// Student profile API
 app.get("/profile/student", authoriseUser, async (req, res) => {
   try {
-    if (req.user.role !== "student") {
+    const user=req.user;
+    if(!user)
+      return res.status(403).json({message: "Invalid request"});
+
+    const role=user.role;
+    if (role !== "student") {
       return res.status(403).json({ message: "Access denied. Students only." });
     }
 
-   const student = await Student.findById(req.user.id);
+   const student = await Student.findOne(user.registrationId);
 
     if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+      return res.status(404).json({ message: "Data not found" });
     }
 
-    res.json({
+    return res.status(201).json({
       message: "Profile fetched successfully",
       student,
     });
 
   } catch (err) {
     console.error("Profile fetch error:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
 
-
+// Grievance API
 app.get("/api/grievances/my", authoriseUser, async (req, res) => {
   try {
+    const user=req.user;
+    if (!user) {
+      return res.status(403).json({ message: "Invalid request" });
+    }
+
+    const s_role=user.role;
     // Check if role is student
-    if (req.user.role !== "student") {
+    if (s_role !== "student") {
       return res.status(403).json({ message: "Access denied" });
     }
 
     // Find grievances belonging to logged-in student
-    const grievances = await Grievance.find({ registrationId: req.user.registrationId });
+    const grievances = await Grievance.find({ registrationId: user.registrationId });
 
-    res.json({ data:grievances });
+    return res.status(201).json({ data:grievances });
   } catch (err) {
     console.error("Fetch grievances error:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
-
+// Add grievance API
 app.post(
   "/api/grievances",
   authoriseUser,
   upload.array("images", 5), // Accept max 5 images uploaded with key "images"
   async (req, res) => {
     try {
-      if (req.user.role !== "student") {
+      const user=req.user;
+      if(!user)
+        return res.status(403).json({message: "Invalid request"})
+
+      const role=user.role;
+      if (role !== "student") {
         return res.status(403).json({ message: "Only students can submit grievances" });
       }
 
@@ -249,11 +271,11 @@ app.post(
       }
 
       // Map uploaded files to image links (paths relative to server)
-const images = req.files ? req.files.map(file => ({ link: `/uploads/${file.filename}` })) : [];
+      const images = req.files ? req.files.map(file => ({ link: `/uploads/${file.filename}` })) : [];
 
 
       const grievance = new Grievance({
-        userId: req.user.id,
+        registrationId: user.registrationId,
         title,
         description,
         category,
@@ -262,10 +284,10 @@ const images = req.files ? req.files.map(file => ({ link: `/uploads/${file.filen
 
       await grievance.save();
 
-      res.status(201).json({ message: "Grievance submitted successfully", grievance });
+      return res.status(201).json({ message: "Grievance submitted successfully", grievance });
     } catch (err) {
       console.error("Create grievance error:", err);
-      res.status(500).json({ message: "Server error" });
+      return res.status(500).json({ message: "Server error" });
     }
   }
 );

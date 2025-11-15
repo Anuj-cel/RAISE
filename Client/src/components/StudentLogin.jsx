@@ -32,7 +32,7 @@ const StudentLogin = () => {
       // Success
       localStorage.setItem('token', data.token); 
       localStorage.setItem('role', data.role);
-      localStorage.setItem('student', JSON.stringify(data.student));
+      localStorage.setItem('studentId', JSON.stringify(data.student.registrationId));
       
       navigate('/student/dashboard');
 

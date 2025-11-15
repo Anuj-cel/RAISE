@@ -1,33 +1,32 @@
 import jwt from "jsonwebtoken";
-import User from "../models/userModel.js";
-import { ApiError } from "../utils/errorHandler.js";
 
-export async function checkAuth(req, res, next) {
-  try {
-    const authHeader = req.headers["authorization"];
-    const token =
-      req.cookies?.access_token ||
-      (authHeader &&
-        authHeader.startsWith("Bearer") &&
-        authHeader.split(" ")[1]);
+export const authoriseUser = async (req, res, next) => {
+  const header = req.headers.authorization;
 
-    if (!token)
-      throw new ApiError(401, "Unauthorized request or token is missing.");
-    
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    if (!decodedToken) throw new ApiError(400, "Not a valid token.");
-
-    const id = decodedToken.id;
-    const user = await User.findById(id).select("-password -refreshToken");
-    if (!user) throw new ApiError(401, "Unauthorized or invalid token.");
-
-    req.user = user;
-    next();
-  } catch (error) {
-    console.error(error);
-    if (error instanceof ApiError) {
-      return res.status(error.statusCode).json({ success: false, message: error.message });
-    }
-    return res.status(500).json({ success: false, message: "Internal Server Error" });
+  if (!header || !header.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Not authorized" });
   }
-}
+
+  const token = header.split(" ")[1];
+
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRETKEY);
+
+    // decoded should have 'id' and 'role' because you signed the token with these fields
+    const { id, role,staffId,registrationId } = decoded;
+
+    // You can add role check here if needed, e.g. allow only student/admin
+    if (role !== "student" && role !== "admin") {
+      return res.status(403).json({ message: "Access denied: invalid role" });
+    }
+
+    // Attach user info to request object
+    req.user = { id, role,staffId,registrationId };
+
+    next(); // proceed to next middleware or route handler
+
+  } catch (err) {
+    return res.status(401).json({ message: "Token invalid or expired" });
+  }
+};

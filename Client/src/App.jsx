@@ -36,8 +36,8 @@ function App() {
         <Route path="/register/student" element={<StudentRegister/>} />
         <Route path="/login/student" element={<StudentLogin />} />
         <Route path="/login/admin" element={<AdminLogin/>}/>
-        <Route path="/student/dashboard" element={<MyGrievances token={token}  />} />
-        <Route path="/student/raiseGrievance" element={<RaiseGrievance  token={token} />} />
+        <Route path="/student/dashboard" element={<MyGrievances  />} />
+        <Route path="/student/raiseGrievance" element={<RaiseGrievance  />} />
         
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         

@@ -6,8 +6,8 @@ const studentSchema = new mongoose.Schema({
   role: { type: String, default: "student" },
   name: { type: String, required: true },
   registrationId: { type: String, required: true, unique: true, lowercase:true, trim:true }, // Registration ID
-  course: { type: String, required: true }, // B.Tech, M.Tech, MCA, PhD, etc.
-  yearOfStudy: { type: Number, required:true }, // 1–4
+  course: { type: String, enum: ["B.Tech", "M.Tech", "MCA", "MSc", "Phd"], required: true }, // B.Tech, M.Tech, MCA, PhD, etc.
+  batch: { type: String, required:true }, // 2023-26
   personalEmail: { type: String, required: true, unique: true, lowercase: true, trim: true },
   phoneNumber: { type: String },
   password:{type:String,required:true},

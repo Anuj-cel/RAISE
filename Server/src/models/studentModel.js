@@ -11,7 +11,7 @@ const studentSchema = new mongoose.Schema({
   personalEmail: { type: String, required: true, unique: true, lowercase: true, trim: true },
   phoneNumber: { type: String },
   password:{type:String,required:true},
-  hostelName: { type: String, required: true },
+  hostelName: { type: String, enum:["A","B","C","D","E","F","G","H","I","J","K","L"],required: true },
   roomNumber: { type: String, required: true },
 }, { timestamps: true });
 

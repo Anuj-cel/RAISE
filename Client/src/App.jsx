@@ -12,6 +12,7 @@ import RaiseGrievance from "./components/RaiseGrienvance";
 import MyGrievances from "./components/MyGrievances";
 import StudentLogin from "./components/StudentLogin";
 import AdminLogin from "./components/AdminLogin";
+import StudentProfile from "./components/StudentProfile";
 function App() {
    const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [role, setRole] = useState("student"); // "student" | "admin"
@@ -38,7 +39,7 @@ function App() {
         <Route path="/login/admin" element={<AdminLogin/>}/>
         <Route path="/student/dashboard" element={<MyGrievances  />} />
         <Route path="/student/raiseGrievance" element={<RaiseGrievance  />} />
-        
+        <Route path="/student/profile" element={<StudentProfile  />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         
       </Routes>

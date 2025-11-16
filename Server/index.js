@@ -86,7 +86,7 @@ app.post("/register/admin", async (req, res) => {
       designation,
       hostelName,
       phoneNumber,
-      email,
+      personalEmail,
       password,
     } = req.body;
 
@@ -96,7 +96,7 @@ app.post("/register/admin", async (req, res) => {
       !designation ||
       !hostelName ||
       !phoneNumber ||
-      !email ||
+      !personalEmail ||
       !password
     ) {
       return res.status(400).json({ message: "Missing admin fields" });
@@ -113,7 +113,7 @@ app.post("/register/admin", async (req, res) => {
       name,
       designation,
       hostelName,
-      email,
+      personalEmail,
       phoneNumber,
       password: hashedPassword,
     });

@@ -366,6 +366,35 @@ app.get("/grievance/:id", authoriseUser, async (req, res) => {
 });
 
 
+// Update grievance status API for admin from pending to in-progress/resolved
+app.post("/grievance/:id/status", authoriseUser, async (req, res) => {
+  try {
+    const user=req.user;
+    if (!user) {
+      return res.status(403).json({ message: "Invalid request" });
+    }
+    const role=user.role;
+    if (role !== "admin") {
+      return res.status(403).json({ message: "Access denied" });
+    } 
+    const grievanceId = req.params.id;
+    const { status } = req.body;
+    const grievance = await Grievance.findByIdAndUpdate(
+      grievanceId,
+      { status }
+    );
+    if (!grievance) {
+      return res.status(404).json({ message: "Grievance not found" });
+    }
+    return res.status(201).json({ message: "Status updated successfully", grievance });
+  } catch (err) {
+
+    console.error("Update grievance status error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Global error handler
 
 app.use((req,res,err,next)=>{
   console.error(err.stack);

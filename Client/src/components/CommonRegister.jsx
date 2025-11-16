@@ -192,7 +192,7 @@ const CommonRegister = () => {
             <input
               type="number"
               name="yearOfStudy"
-              placeholder="Year of Study (1-4)"
+              placeholder="yearOfStudy"
               value={formData.yearOfStudy}
               onChange={handleChange}
               min={1}

@@ -1,104 +1,104 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { Link } from "react-router-dom";
+import AdminNavbar from "./AdminNavbar";
 
-
-const AdminDashboard = () => {
-  const [grievances, setGrievances] = useState([]);
-  const [filterStatus, setFilterStatus] = useState("all");
-
-  const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    fetchGrievances();
-  }, [filterStatus]);
-
-  const fetchGrievances = async () => {
-    try {
-      let url = "http://localhost:8080localhost:8080/api/grievances";
-      if (filterStatus !== "all") {
-        url += `?status=${filterStatus}`;
-      }
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setGrievances(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const updateStatus = async (id, status) => {
-    try {
-      await fetch(`http://localhost:8080localhost:8080/api/grievances/${id}`, {
-  method: "PATCH",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  },
-  body: JSON.stringify({ status }),
-});
-      fetchGrievances();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
+export default function AdminDashboard() {
   return (
-    <div className="max-w-5xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+    <div style={{ background: "#f5f6fa", minHeight: "100vh" }}>
+      <AdminNavbar />
 
-      <div className="mb-4">
-        <label htmlFor="filterStatus" className="mr-2 font-semibold">
-          Filter by status:
-        </label>
-        <select
-          id="filterStatus"
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="border p-1"
-        >
-          <option value="all">All</option>
-          <option value="pending">Pending</option>
-          <option value="done">Resolved</option>
-        </select>
+      <div style={container}>
+        <h1 style={title}>Admin Dashboard</h1>
+
+        <p style={subtitle}>Manage hostel grievance requests efficiently</p>
+
+        <div style={cardContainer}>
+          <Link to="/admin/grievances" style={linkStyle}>
+            <div style={card}>
+              <h3 style={cardTitle}>All Grievances</h3>
+              <p style={cardText}>View every grievance submitted</p>
+            </div>
+          </Link>
+
+          <Link to="/admin/grievances/pending" style={linkStyle}>
+            <div style={card}>
+              <h3 style={cardTitle}>Pending</h3>
+              <p style={cardText}>Grievances waiting for action</p>
+            </div>
+          </Link>
+
+          <Link to="/admin/grievances/running" style={linkStyle}>
+            <div style={card}>
+              <h3 style={cardTitle}>Running</h3>
+              <p style={cardText}>Tasks currently being processed</p>
+            </div>
+          </Link>
+
+          <Link to="/admin/grievances/completed" style={linkStyle}>
+            <div style={card}>
+              <h3 style={cardTitle}>Completed</h3>
+              <p style={cardText}>Resolved grievance records</p>
+            </div>
+          </Link>
+        </div>
       </div>
-
-      <ul>
-        {grievances.map((g) => (
-          <li
-            key={g._id}
-            className="border p-3 mb-2 rounded shadow-sm flex justify-between items-center"
-          >
-            <div>
-              <h3 className="font-bold">{g.title}</h3>
-              <p>{g.description}</p>
-              <small>By User: {g.userId}</small>
-            </div>
-            <div className="space-x-2">
-              <button
-                className="bg-yellow-400 px-3 py-1 rounded"
-                onClick={() => updateStatus(g._id, "pending")}
-              >
-                Pending
-              </button>
-              <button
-                className="bg-green-600 text-white px-3 py-1 rounded"
-                onClick={() => updateStatus(g._id, "done")}
-              >
-                Resolve
-              </button>
-              <span
-                className={`px-2 py-1 rounded text-white ${
-                  g.status === "pending" ? "bg-yellow-500" : "bg-green-600"
-                }`}
-              >
-                {g.status}
-              </span>
-            </div>
-          </li>
-        ))}
-      </ul>
     </div>
   );
+}
+
+/* ---------- STYLES ---------- */
+
+const container = {
+  padding: "30px",
+  textAlign: "center",
 };
 
-export default AdminDashboard;
+const title = {
+  fontSize: "36px",
+  fontWeight: "bold",
+  marginBottom: "10px",
+  color: "#2c3e50",
+};
+
+const subtitle = {
+  fontSize: "18px",
+  color: "#7f8c8d",
+  marginBottom: "40px",
+};
+
+const cardContainer = {
+  display: "grid",
+  gridTemplateColumns: "repeat(2, 1fr)",
+  gap: "20px",
+  maxWidth: "700px",
+  margin: "0 auto",
+};
+
+const card = {
+  background: "white",
+  padding: "25px",
+  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+  borderRadius: "10px",
+  cursor: "pointer",
+  transition: "0.3s",
+};
+
+card.hover = {
+  transform: "translateY(-5px)",
+};
+
+const cardTitle = {
+  fontSize: "20px",
+  fontWeight: "bold",
+  color: "#34495e",
+};
+
+const cardText = {
+  fontSize: "14px",
+  color: "#7f8c8d",
+  marginTop: "8px",
+};
+
+const linkStyle = {
+  textDecoration: "none",
+};

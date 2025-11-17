@@ -25,12 +25,6 @@ const AdminNavbar = ({ adminName }) => {
 
       <div style={styles.right}>
 
-  const guestLinks = [
-    // { path: "/login/student", label: "Login" },
-    { path: "/login/student", label: <button className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Student Login</button> },
-    { path: "/login/admin", label: <button className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">Admin Login</button> },
-    // { path: "/signup", label: "Signup" },
-  ];
         {/* ✅ HOME BUTTON */}
         <NavLink to="/" style={styles.link}>
           Home

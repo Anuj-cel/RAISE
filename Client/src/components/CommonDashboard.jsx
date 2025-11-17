@@ -1,40 +1,55 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CommonDashboard = () => {
   const navigate = useNavigate();
 
-  const handleLoginClick = (role) => {
-    // Navigate to login page with role as query param or state
-    if(role==='student')
-    navigate(`/login/student`);
-    else
-    navigate(`/login/admin`);
-  };
+  // Add your hostel images here (place inside public/images/)
+  const images = [
+    "/images/hostel-1.png",
+    "/images/hostel-2.jpg",
+    "/images/hostel-3.jpg",
+  ];
+
+  const [index, setIndex] = useState(0);
+
+  // Auto-slide every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % images.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
-      <h1 className="text-4xl font-bold mb-8">Hostel Grievance Redressal System</h1>
-      <p className="mb-6 text-lg text-gray-700">Please select your login type</p>
+    <div className="relative min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden">
 
-      <div className="space-x-6">
-        <button
-          onClick={() => handleLoginClick("student")}
-          className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-        >
-          Student Login
-        </button>
+      {/* Background Slideshow */}
+      <div className="absolute inset-0">
+        {images.map((img, i) => (
+          <img
+            key={i}
+            src={img}
+            alt="Hostel"
+            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-1000 
+              ${i === index ? "opacity-100" : "opacity-0"}`}
+          />
+        ))}
+      </div>
 
-        <button
-          onClick={() => handleLoginClick("admin")}
-          className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition"
-        >
-          Admin Login
-        </button>
+      {/* Dark Transparent Overlay */}
+      <div className="absolute inset-0 bg-black/50"></div>
+
+      {/* Foreground Content */}
+      <div className="relative text-center text-white">
+        <h1 className="text-4xl font-bold mb-140">
+          Hostel Grievance Redressal System
+        </h1>
+
+        
       </div>
     </div>
   );
 };
-
 
 export default CommonDashboard;

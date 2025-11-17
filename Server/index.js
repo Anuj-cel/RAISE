@@ -265,7 +265,7 @@ app.get("/api/grievances/my", authoriseUser, async (req, res) => {
 
     // Find grievances belonging to logged-in student
     const grievances = await Grievance.find({ registrationId: user.registrationId });
-
+console.log("All griencances from the student", grievances);
     return res.status(201).json({ data:grievances });
   } catch (err) {
     console.error("Fetch grievances error:", err);
@@ -273,7 +273,7 @@ app.get("/api/grievances/my", authoriseUser, async (req, res) => {
   }
 });
 
-// Add grievance API
+// Add grievance API for student
 app.post(
   "/api/grievances",
   authoriseUser,
@@ -297,9 +297,12 @@ app.post(
 
       // Map uploaded files to image links (paths relative to server)
       const images = req.files ? req.files.map(file => ({ link: `/uploads/${file.filename}` })) : [];
-
-
+const currentStudent=await Student.findOne({registrationId:user.registrationId});
+if(!currentStudent){
+  return res.status(403).json({ message: "Access denied" });
+}
       const grievance = new Grievance({
+        hostelName: currentStudent.hostelName,
         registrationId: user.registrationId,
         title,
         description,

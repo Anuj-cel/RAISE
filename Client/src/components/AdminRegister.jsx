@@ -88,7 +88,7 @@ const AdminRegisterationPage = () => {
       name: formData.name,
       staffId: formData.staffId,
       designation: formData.designation,
-      email: formData.email,
+      personalEmail: formData.email,
       hostelName: formData.hostelName,
       phoneNumber: formData.adminPhoneNumber, // Mapped to phoneNumber on backend
       password: formData.password,
@@ -115,7 +115,7 @@ const AdminRegisterationPage = () => {
       }
       
       console.log('Admin registration successful! Redirecting to login.');
-      navigate('/login');
+      navigate('/admin/dashboard');
     } catch (err) {
       setError('A network error occurred. Please check the server connection.');
     } finally {

@@ -98,7 +98,7 @@ const StudentRegister = () => {
       }
       
       console.log('Registration successful! Redirecting to login.');
-      navigate('/login');
+      navigate('/login/student');
     } catch (err) {
       setError('A network error occurred. Please check the server connection.');
     } finally {
@@ -134,16 +134,16 @@ const StudentRegister = () => {
               value={formData.name} onChange={handleChange} required={true} 
             />
             <FormInput 
-              label="Registration ID" name="registrationId" type="text" placeholder="2023CS001" 
+              label="Registration ID" name="registrationId" type="text" placeholder="2023PGCSCA016" 
               value={formData.registrationId} onChange={handleChange} required={true} 
             />
             <FormInput 
-              label="Course" name="course" type="text" placeholder="B.Tech Computer Science" 
+              label="Course" name="course" type="text" placeholder="MCA" 
               value={formData.course} onChange={handleChange} required={true} 
             />
             <FormInput 
-              label="Year of Study" name="yearOfStudy" type="number" placeholder="1, 2, 3 or 4" 
-              value={formData.yearOfStudy} onChange={handleChange} required={true} min={1} max={4}
+              label="Batch" name="yearOfStudy" type="number" placeholder="2023-26" 
+              value={formData.yearOfStudy} onChange={handleChange} required={true} 
             />
 
             {/* --- Contact & Hostel Details --- */}
@@ -161,7 +161,7 @@ const StudentRegister = () => {
               value={formData.phoneNumber} onChange={handleChange} required={false}
             />
             <FormInput 
-              label="Hostel Name" name="hostelName" type="text" placeholder="C Block" 
+              label="Hostel Name" name="hostelName" type="text" placeholder="J (Upper case)" 
               value={formData.hostelName} onChange={handleChange} required={true}
               Icon={Building2}
             />

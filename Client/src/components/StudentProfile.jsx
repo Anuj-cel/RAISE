@@ -33,6 +33,13 @@ if(!token){
     }
   };
 
+  let noYears=0;
+  if(student){
+    // Geting No. of years
+  const currentYear = new Date().getFullYear();
+  noYears = currentYear-student.batch+1;
+  }
+
   useEffect(() => {
     
     getStudentData();
@@ -95,7 +102,7 @@ if(!token){
 
           <div>
             <h1 className="text-3xl font-bold">{student.name}</h1>
-            <p className="text-gray-600 text-lg">{student.course} — Year {student.yearOfStudy}</p>
+            <p className="text-gray-600 text-lg">{student.course} — {noYears} Year</p>
             <p className="text-gray-600">Hostel {student.hostelName}</p>
           </div>
         </div>
@@ -114,8 +121,8 @@ if(!token){
           </div>
 
           <div>
-            <p className="text-gray-500 text-sm">Year of Study</p>
-            <p className="font-semibold">{student.yearOfStudy}</p>
+            <p className="text-gray-500 text-sm">Batch</p>
+            <p className="font-semibold">{student.batch}</p>
           </div>
 
           <div>

@@ -78,7 +78,7 @@ const RaiseGrievance = () => {
         setDescription("");
         setImages([]);
         setCategory("cleanliness");
-        setTimeout(() => navigate("/student/myGrievances"), 2000);
+        setTimeout(() => navigate("/student/dashboard"), 2000);
       } else {
         showAlert(data.message || "Failed to submit grievance");
         if (data.message === "Token invalid or expired") {

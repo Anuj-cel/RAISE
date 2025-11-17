@@ -15,7 +15,7 @@ import PendingGrievances from "./components/PendingGrievances";
 import RunningGrievances from "./components/RunningGrievances";
 import CompletedGrievances from "./components/CompletedGrievances";
 import AllGrievancesAdmin from "./components/AllGrievancesAdmin";
-
+import AdminRegister from './components/AdminRegister'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -32,12 +32,17 @@ function App() {
         {/* PUBLIC ROUTES */}
         <Route path="/" element={<CommonDashboard />} />
         <Route path="/register/student" element={<StudentRegister />} />
+        <Route path="/register/admin" element={<AdminRegister />} />
         <Route path="/login/student" element={<StudentLogin />} />
+        <Route path="/login/admin" element={<AdminLogin/>}/>
+
+        {/* Student Routes */}
         <Route path="/student/dashboard" element={<MyGrievances  />} />
         <Route path="/student/raiseGrievance" element={<RaiseGrievance  />} />
         <Route path="/student/profile" element={<StudentProfile  />} />
+
+        {/* Admin Routes */}
         <Route path="/admin/profile" element={<AdminProfile />} />
-        <Route path="/login/admin" element={<AdminLogin/>}/>
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/grievances" element={<AllGrievancesAdmin />} />
         <Route path="/admin/grievances/pending" element={<PendingGrievances />} />

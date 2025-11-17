@@ -9,7 +9,7 @@ const MyGrievances = ({ token }) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        navigate('login/student');
+        navigate('/login/student');
         return;
       }
 
@@ -48,10 +48,9 @@ const MyGrievances = ({ token }) => {
                 className={`px-3 py-1 rounded text-sm font-semibold ${
                   g.status === "pending"
                   ? "bg-yellow-500 text-white"
-                    : g.status === "done"
-                    ? "bg-green-600 text-white"
-                    : "bg-gray-400 text-white"
-                }`}
+                  : g.status === "running"
+                  ? "bg-orange-600 text-white"
+                  : "bg-green-600 text-white" }`}
               >
                 {g.status}
               </span>

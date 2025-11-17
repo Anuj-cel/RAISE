@@ -110,13 +110,6 @@ const AdminLogin = () => {
         </form>
         
         <div className="mt-6 text-center text-sm space-y-2">
-            {/* New: Registration Link */}
-            <p className="text-gray-700">
-                New Staff? 
-                <Link to="/register/admin" className="ml-1 font-medium text-indigo-600 hover:text-indigo-500">
-                    Register Here
-                </Link>
-            </p>
             {/* Back to Role Selection */}
             <p>
                 <Link to="/" className="font-medium text-gray-500 hover:text-indigo-600">

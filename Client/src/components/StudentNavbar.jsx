@@ -9,22 +9,22 @@ const StudentNavbar = ({ adminName }) => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     localStorage.removeItem("studentId");
-    navigate("/login/student");
+    navigate("/");
   };
 
   return (
     <nav style={styles.navbar}>
       <div style={styles.left}>
         <NavLink to="/" style={styles.link}>    
-
-        <h2 style={styles.brand}>🎓 Grievance Portal</h2>
+          <h2 style={styles.brand}>🎓 Grievance Portal</h2>
         </NavLink>
       </div>
 
       <div style={styles.right}>
 
         {/* ✅ HOME BUTTON ADDED */}
-        <NavLink to="/student/dashboard" style={styles.link}>
+        <NavLink to="/student/dashboard" style={({ isActive }) => ({
+          ...styles.link,color: isActive ? "yellowgreen" : "#ecf0f1",})}>
           Home
         </NavLink>
 
@@ -32,11 +32,13 @@ const StudentNavbar = ({ adminName }) => {
           Pending
         </NavLink> */}
 
-        <NavLink to="/student/raiseGrievance" style={styles.link}>
+        <NavLink to="/student/raiseGrievance" style={({ isActive }) => ({
+          ...styles.link,color: isActive ? "yellowgreen" : "#ecf0f1",})}>
           RaiseGrienvance
         </NavLink>
 
-        <NavLink to="/student/profile" style={styles.link}>
+        <NavLink to="/student/profile" style={({ isActive }) => ({
+          ...styles.link,color: isActive ? "yellowgreen" : "#ecf0f1",})}>
           Profile
         </NavLink>
 
@@ -66,7 +68,7 @@ const styles = {
   right: {
     display: "flex",
     alignItems: "center",
-    gap: "15px",
+    gap: "2.5rem",
   },
   link: {
     color: "#ecf0f1",

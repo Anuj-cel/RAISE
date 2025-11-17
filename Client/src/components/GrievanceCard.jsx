@@ -45,11 +45,17 @@ export default function GrievanceCard() {
 
           <div className="text-sm mb-4 space-y-1 text-gray-700">
             <p><span className="font-medium">Registration ID:</span> {grievance.registrationId}</p>
-            <p><span className="font-medium">Hostel:</span> {grievance.hostelName}</p>
+            <p><span className="font-bold">Hostel:</span> {grievance.hostelName}</p>
             <p><span className="font-medium">Category:</span> {grievance.category}</p>
             <p>
               <span className="font-medium">Status:</span>
-              <span className="ml-1 px-2 py-0.5 rounded text-white text-xs capitalize bg-yellow-500">
+              <span className={`ml-1 px-2 py-0.5 rounded text-white text-xs capitalize ${
+                  grievance.status === "pending"
+                    ? "bg-yellow-500"
+                  : grievance.status === "running"
+                    ? "bg-amber-700"
+                  : "bg-green-600"}`}
+              >
                 {grievance.status}
               </span>
             </p>
@@ -73,7 +79,7 @@ export default function GrievanceCard() {
           )}
 
           <div className="mt-6 flex gap-3 justify-end">
-            <button
+            {grievance.status === "pending" ? (<button
               onClick={async () => {
                 await fetch(`http://localhost:8080/grievance/${id}/status`, {
                   method: "POST",
@@ -88,9 +94,9 @@ export default function GrievanceCard() {
               className="bg-yellow-600 hover:bg-yellow-700 text-white font-medium px-4 py-2 rounded-xl shadow"
             >
               Mark Running
-            </button>
+            </button>) : ""}
 
-            <button
+            {grievance.status === "pending" || grievance.status === "running" ? (<button
               onClick={async () => {
                 await fetch(`http://localhost:8080/grievance/${id}/status`, {
                   method: "POST",
@@ -105,7 +111,7 @@ export default function GrievanceCard() {
               className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-xl shadow"
             >
               Mark Completed
-            </button>
+            </button>) : ""}
           </div>
         </div>
       </div>

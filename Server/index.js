@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import mongoose from "mongoose";
-// import grievanceRoutes from "./routes/grievanceRoutes.js";
 import cors from "cors"
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -13,12 +12,7 @@ import { authoriseUser } from "./src/middleware/auth.middleware.js";
 import path from "path";
 import { upload } from "./src/middleware/upload.js";
 
-//import routes
 const app = express();
-// app.use(cors({
-//   origin:"*",
-//   credentials: false,
-// }));
 
 app.use(cors())
 app.use(express.json());
@@ -29,7 +23,7 @@ mongoose.connect(`${process.env.MONGO_URI}`)
 .then(() => console.log("✅ MongoDB connected"))
 .catch(err => console.error(err));
 
-// Student registration route
+// Student registration route API
 app.post("/register/student", async (req, res) => {
   try {
     const {
@@ -67,7 +61,7 @@ app.post("/register/student", async (req, res) => {
       name,
       registrationId,
       course,
-      yearOfStudy,
+      batch:yearOfStudy,
       personalEmail,
       phoneNumber,
       hostelName,
@@ -77,12 +71,12 @@ app.post("/register/student", async (req, res) => {
 
     return res.status(201).json({ message: "Student registered successfully", student });
   } catch (err) {
-    console.error("Student register error:", err);
+    // console.error("Student register error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
 
-// Admin registration route
+// Admin registration route API
 app.post("/register/admin", async (req, res) => {
   try {
     const {
@@ -125,13 +119,13 @@ app.post("/register/admin", async (req, res) => {
 
     return res.status(201).json({ message: "Staff registered successfully", admin });
   } catch (err) {
-    console.error("Admin register error:", err);
+    // console.error("Admin register error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
 
 
-//login,signup
+// Student login API
 app.post("/login/student", async (req, res) => {
   try {
     const { registrationId, password } = req.body;
@@ -165,7 +159,7 @@ app.post("/login/student", async (req, res) => {
   }
 });
 
-// Admin login route
+// Admin login API
 app.post("/login/admin", async (req, res) => {
   try {
     const { staffId, password } = req.body;
@@ -194,7 +188,7 @@ app.post("/login/admin", async (req, res) => {
       admin,
     });
   } catch (err) {
-    console.error("Admin login error:", err);
+    // console.error("Admin login error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
@@ -217,19 +211,19 @@ app.get("/profile/student", authoriseUser, async (req, res) => {
     if (!student) {
       return res.status(404).json({ message: "Data not found" });
     }
-console.log("This is student",student)
+  // console.log("This is student",student)
     return res.status(201).json({
       message: "Profile fetched successfully",
       student,
     });
 
   } catch (err) {
-    console.error("Profile fetch error:", err);
+    // console.error("Profile fetch error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
 
-
+// Admin profile API
 app.get("/profile/admin", authoriseUser, async (req, res) => {
   try {
     const user=req.user;
@@ -240,7 +234,7 @@ app.get("/profile/admin", authoriseUser, async (req, res) => {
       return res.status(403).json({ message: "Access denied. Admins only." });
     }
 
-   const admin = await Admin.findOne({staffId:user.staffId});
+    const admin = await Admin.findOne({staffId:user.staffId});
     if (!admin) {
       return res.status(404).json({ message: "Data not found" });
     } 
@@ -250,38 +244,10 @@ app.get("/profile/admin", authoriseUser, async (req, res) => {
     });
   }
     catch (err) {
-    console.error("Profile fetch error:", err);
+    // console.error("Profile fetch error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
-
-
-app.get("/profile/admin", authoriseUser, async (req, res) => {
-  try {
-    const user=req.user;
-    if(!user)
-      return res.status(403).json({message: "Invalid request"});
-    const role=user.role;
-    if (role !== "admin") {
-      return res.status(403).json({ message: "Access denied. Admins only." });
-    }
-console.log("This is user data",user);
-   const admin = await Admin.findOne({staffId:user.staffId});
-   console.log("This is admin data",admin);
-    if (!admin) {
-      return res.status(404).json({ message: "Data not found" });
-    }
-    return res.status(201).json({
-      message: "Profile fetched successfully",
-      admin,
-    });
-  }
-    catch (err) {
-    console.error("Profile fetch error:", err);
-    return res.status(500).json({ message: "Server error" });
-  }
-}
-);
 
 // Get grievances of logged-in student
 app.get("/api/grievances/my", authoriseUser, async (req, res) => {
@@ -299,10 +265,10 @@ app.get("/api/grievances/my", authoriseUser, async (req, res) => {
 
     // Find grievances belonging to logged-in student
     const grievances = await Grievance.find({ registrationId: user.registrationId });
-console.log("All griencances from the student", grievances);
+  
     return res.status(201).json({ data:grievances });
   } catch (err) {
-    console.error("Fetch grievances error:", err);
+    // console.error("Fetch grievances error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
@@ -331,10 +297,10 @@ app.post(
 
       // Map uploaded files to image links (paths relative to server)
       const images = req.files ? req.files.map(file => ({ link: `/uploads/${file.filename}` })) : [];
-const currentStudent=await Student.findOne({registrationId:user.registrationId});
-if(!currentStudent){
-  return res.status(403).json({ message: "Access denied" });
-}
+      const currentStudent=await Student.findOne({registrationId:user.registrationId});
+      if(!currentStudent){
+        return res.status(403).json({ message: "Access denied" });
+      }
       const grievance = new Grievance({
         hostelName: currentStudent.hostelName,
         registrationId: user.registrationId,
@@ -348,7 +314,7 @@ if(!currentStudent){
 
       return res.status(201).json({ message: "Grievance submitted successfully", grievance });
     } catch (err) {
-      console.error("Create grievance error:", err);
+      // console.error("Create grievance error:", err);
       return res.status(500).json({ message: "Server error" });
     }
   }
@@ -366,17 +332,21 @@ app.get("/all/greivances/admin", authoriseUser,async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
     const staffId=user.staffId;
+    if (!staffId) {
+      return res.status(403).json({ message: "Invalid request : Id not recived" });
+    }
+
     const admin=await Admin.findOne({staffId});
     if(!admin){
       return res.status(403).json({ message: "Access denied" });
     }
     const hostelName=admin.hostelName;
-    console.log("Hostel name of admin:",hostelName);
+    // console.log("Hostel name of admin:",hostelName);
     const grievances = await Grievance.find({hostelName});
     return res.status(201).json({ data: grievances });
   }
   catch (err) {
-    console.error("Fetch all grievances error:", err);
+    // console.error("Fetch all grievances error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
@@ -389,6 +359,10 @@ app.get("/grievance/:id", authoriseUser, async (req, res) => {
       return res.status(403).json({ message: "Invalid request" });
     }
     const grievanceId = req.params.id;
+    if (!grievanceId) {
+      return res.status(403).json({ message: "Invalid request : Id not recived" });
+    }
+
     const grievance = await Grievance.findOne
       ({ _id: grievanceId });
 
@@ -398,7 +372,7 @@ app.get("/grievance/:id", authoriseUser, async (req, res) => {
 
     return res.status(201).json({ data: grievance });
   } catch (err) {
-    console.error("Fetch grievance error:", err);
+    // console.error("Fetch grievance error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
@@ -416,7 +390,15 @@ app.post("/grievance/:id/status", authoriseUser, async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     } 
     const grievanceId = req.params.id;
+    if (!grievanceId) {
+      return res.status(403).json({ message: "Invalid request : Id not recived" });
+    }
+
     const { status } = req.body;
+    if (status !=="pending" || status !=="running" || status !=="completed") {
+      return res.status(403).json({ message: "Invalid status" });
+    }
+
     const grievance = await Grievance.findByIdAndUpdate(
       grievanceId,
       { status }
@@ -426,8 +408,7 @@ app.post("/grievance/:id/status", authoriseUser, async (req, res) => {
     }
     return res.status(201).json({ message: "Status updated successfully", grievance });
   } catch (err) {
-
-    console.error("Update grievance status error:", err);
+    // console.error("Update grievance status error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });

@@ -7,7 +7,7 @@ const AdminNavbar = ({ adminName }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/login/admin");
+    navigate("/");
   };
 
   return (
@@ -22,19 +22,23 @@ const AdminNavbar = ({ adminName }) => {
       <div style={styles.right}>
 
         {/* ✅ HOME BUTTON ADDED */}
-        <NavLink to="/admin/dashboard" style={styles.link}>
+        <NavLink to="/admin/dashboard" style={({ isActive }) => ({
+          ...styles.link,color: isActive ? "yellowgreen" : "#ecf0f1",})}>
           Home
         </NavLink>
 
-        <NavLink to="/admin/grievances/pending" style={styles.link}>
+        <NavLink to="/admin/grievances/pending" style={({ isActive }) => ({
+          ...styles.link,color: isActive ? "yellowgreen" : "#ecf0f1",})}>
           Pending
         </NavLink>
 
-        <NavLink to="/admin/grievances/completed" style={styles.link}>
+        <NavLink to="/admin/grievances/completed" style={({ isActive }) => ({
+          ...styles.link,color: isActive ? "yellowgreen" : "#ecf0f1",})}>
           Completed
         </NavLink>
 
-        <NavLink to="/admin/profile" style={styles.link}>
+        <NavLink to="/admin/profile" style={({ isActive }) => ({
+          ...styles.link,color: isActive ? "yellowgreen" : "#ecf0f1",})}>
           Profile
         </NavLink>
 
@@ -64,7 +68,7 @@ const styles = {
   right: {
     display: "flex",
     alignItems: "center",
-    gap: "15px",
+    gap: "2.5rem",
   },
   link: {
     color: "#ecf0f1",

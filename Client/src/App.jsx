@@ -14,6 +14,7 @@ import RaiseGrievance from "./components/RaiseGrienvance";
 import MyGrievances from "./components/MyGrievances";
 import StudentLogin from "./components/StudentLogin";
 import AdminLogin from "./components/AdminLogin";
+import StudentProfile from "./components/StudentProfile";
 import AllGrievances from "./components/AllGrievances";
 import AdminNavbar from "./components/AdminNavbar";
 import PendingGrievances from "./components/PendingGrievances";
@@ -37,13 +38,10 @@ function App() {
         <Route path="/" element={<CommonDashboard />} />
         <Route path="/register/student" element={<StudentRegister />} />
         <Route path="/login/student" element={<StudentLogin />} />
-        <Route path="/login/admin" element={<AdminLogin />} />
-
-        {/* STUDENT ROUTES */}
-        <Route path="/student/dashboard" element={<MyGrievances />} />
-        <Route path="/student/raiseGrievance" element={<RaiseGrievance />} />
-
-        {/* ADMIN ROUTES */}
+        <Route path="/login/admin" element={<AdminLogin/>}/>
+        <Route path="/student/dashboard" element={<MyGrievances  />} />
+        <Route path="/student/raiseGrievance" element={<RaiseGrievance  />} />
+        <Route path="/student/profile" element={<StudentProfile  />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/grievances" element={<AllGrievances />} />
         <Route path="/admin/grievances/pending" element={<PendingGrievances />} />

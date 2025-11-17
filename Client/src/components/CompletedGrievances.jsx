@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminNavbar from "./AdminNavbar";
@@ -10,19 +11,30 @@ const CompletedGrievances = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchCompleted();
+    fetchFiltered();
   }, []);
 
-  const fetchCompleted = async () => {
+  // ✅ USE SAME ROUTE AND FILTER COMPLETED
+  const fetchFiltered = async () => {
     try {
-      const res = await fetch("http://localhost:8080/admin/grievance/completed");
+      const adminToken = localStorage.getItem("adminToken");
+
+      const res = await fetch("http://localhost:8080/all/greivances/admin", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
       const data = await res.json();
 
-      if (Array.isArray(data)) {
-        setGrievances(data);
-      } else {
-        console.error("Unexpected response:", data);
-      }
+      const list = Array.isArray(data.data) ? data.data : [];
+
+      // Filter only completed grievances
+      const completedOnly = list.filter((item) => item.status === "completed");
+
+      setGrievances(completedOnly);
     } catch (error) {
       console.error("Error fetching completed grievances:", error);
     }
@@ -32,9 +44,8 @@ const CompletedGrievances = () => {
     navigate(`/admin/grievance/${id}`);
   };
 
-  // 🔍 FILTERED LIST
   const filteredGrievances = grievances.filter((item) =>
-    item.student_id.toLowerCase().includes(searchTerm.toLowerCase())
+    item.registrationId?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -42,12 +53,20 @@ const CompletedGrievances = () => {
       <AdminNavbar />
 
       <div style={{ padding: "20px" }}>
-        {/* Center heading */}
-        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-          Completed Grievances
-        </h2>
+       <h2
+  style={{
+    textAlign: "center",
+    margin: "20px 0",
+    fontSize: "28px",
+    fontWeight: "600",
+    color: "#333",
+    letterSpacing: "0.5px",
+  }}
+>
+  Completed Grievances
+</h2>
 
-        {/* 🔍 SEARCH BAR */}
+
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
         <table
@@ -59,7 +78,7 @@ const CompletedGrievances = () => {
         >
           <thead>
             <tr style={{ background: "#f4f4f4" }}>
-              <th style={thStyle}>Student ID</th>
+              <th style={thStyle}>Registration ID</th>
               <th style={thStyle}>Category</th>
               <th style={thStyle}>Status</th>
               <th style={thStyle}>Date</th>
@@ -77,7 +96,7 @@ const CompletedGrievances = () => {
             ) : (
               filteredGrievances.map((item) => (
                 <tr key={item._id}>
-                  <td style={tdStyle}>{item.student_id}</td>
+                  <td style={tdStyle}>{item.registrationId}</td>
                   <td style={tdStyle}>{item.category}</td>
                   <td style={tdStyle}>{item.status}</td>
                   <td style={tdStyle}>

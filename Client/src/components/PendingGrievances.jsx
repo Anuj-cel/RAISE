@@ -3,28 +3,37 @@ import { useNavigate } from "react-router-dom";
 import AdminNavbar from "./AdminNavbar";
 import SearchBar from "./SearchBar";
 
-const RunningGrievances = () => {
+const PendingGrievances = () => {
   const [grievances, setGrievances] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchRunning();
+    fetchFiltered();
   }, []);
 
-  const fetchRunning = async () => {
+  // ✅ USE SAME ROUTE AND FILTER PENDING
+  const fetchFiltered = async () => {
     try {
-      const res = await fetch("http://localhost:8080/admin/grievance/running");
-      const data = await res.json();
+      const adminToken = localStorage.getItem("adminToken");
 
-      if (Array.isArray(data)) {
-        setGrievances(data);
-      } else {
-        console.error("Unexpected response:", data);
-      }
+      const res = await fetch("http://localhost:8080/all/greivances/admin", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+      const list = Array.isArray(data.data) ? data.data : [];
+
+      // 👉 FILTER ONLY PENDING
+      const pendingOnly = list.filter((item) => item.status === "pending");
+
+      setGrievances(pendingOnly);
     } catch (error) {
-      console.error("Error fetching running grievances:", error);
+      console.error("Error fetching pending grievances:", error);
     }
   };
 
@@ -32,9 +41,9 @@ const RunningGrievances = () => {
     navigate(`/admin/grievance/${id}`);
   };
 
-  // 🔍 FILTER LIST
+  // 🔍 SEARCH BY REGISTRATION ID
   const filteredGrievances = grievances.filter((item) =>
-    item.student_id.toLowerCase().includes(searchTerm.toLowerCase())
+    item.registrationId?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -42,17 +51,21 @@ const RunningGrievances = () => {
       <AdminNavbar />
 
       <div style={{ padding: "20px" }}>
-        
-        {/* Title Centered */}
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <h2>Pending Grievances</h2>
-        </div>
+       
+<h2
+  style={{
+    textAlign: "center",
+    margin: "20px 0",
+    fontSize: "28px",
+    fontWeight: "600",
+    color: "#333",
+    letterSpacing: "0.5px",
+  }}
+>
+  Pending Grievances
+</h2>
 
-        {/* 🔍 Search Component */}
-        <SearchBar 
-          searchTerm={searchTerm} 
-          setSearchTerm={setSearchTerm} 
-        />
+        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
         <table
           style={{
@@ -63,7 +76,7 @@ const RunningGrievances = () => {
         >
           <thead>
             <tr style={{ background: "#f4f4f4" }}>
-              <th style={thStyle}>Student ID</th>
+              <th style={thStyle}>Registration ID</th>
               <th style={thStyle}>Category</th>
               <th style={thStyle}>Status</th>
               <th style={thStyle}>Date</th>
@@ -75,19 +88,18 @@ const RunningGrievances = () => {
             {filteredGrievances.length === 0 ? (
               <tr>
                 <td colSpan="5" style={{ padding: "15px", textAlign: "center" }}>
-                  No Pending grievances found
+                  No pending grievances found
                 </td>
               </tr>
             ) : (
               filteredGrievances.map((item) => (
                 <tr key={item._id}>
-                  <td style={tdStyle}>{item.student_id}</td>
+                  <td style={tdStyle}>{item.registrationId}</td>
                   <td style={tdStyle}>{item.category}</td>
                   <td style={tdStyle}>{item.status}</td>
                   <td style={tdStyle}>
                     {new Date(item.createdAt).toLocaleDateString()}
                   </td>
-
                   <td style={tdStyle}>
                     <button
                       onClick={() => viewGrievance(item._id)}
@@ -123,4 +135,4 @@ const tdStyle = {
   border: "1px solid #ccc",
 };
 
-export default RunningGrievances;
+export default PendingGrievances;

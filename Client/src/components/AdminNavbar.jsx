@@ -13,7 +13,10 @@ const AdminNavbar = ({ adminName }) => {
   return (
     <nav style={styles.navbar}>
       <div style={styles.left}>
-        <h2 style={styles.brand}>🎓 Grievance Portal</h2>
+        <NavLink to="/" style={styles.link}>    
+       
+               <h2 style={styles.brand}>🎓 Grievance Portal</h2>
+               </NavLink>
       </div>
 
       <div style={styles.right}>

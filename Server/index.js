@@ -160,7 +160,7 @@ app.post("/login/student", async (req, res) => {
       student,
     });
   } catch (err) {
-    console.error("Student login error:", err);
+    // console.error("Student login error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
@@ -230,7 +230,60 @@ console.log("This is student",student)
 });
 
 
-// Grievance API
+app.get("/profile/admin", authoriseUser, async (req, res) => {
+  try {
+    const user=req.user;
+    if(!user)
+      return res.status(403).json({message: "Invalid request"});
+    const role=user.role;
+    if (role !== "admin") {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
+
+   const admin = await Admin.findOne({staffId:user.staffId});
+    if (!admin) {
+      return res.status(404).json({ message: "Data not found" });
+    } 
+    return res.status(201).json({
+      message: "Profile fetched successfully",
+      admin,
+    });
+  }
+    catch (err) {
+    console.error("Profile fetch error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+app.get("/profile/admin", authoriseUser, async (req, res) => {
+  try {
+    const user=req.user;
+    if(!user)
+      return res.status(403).json({message: "Invalid request"});
+    const role=user.role;
+    if (role !== "admin") {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
+console.log("This is user data",user);
+   const admin = await Admin.findOne({staffId:user.staffId});
+   console.log("This is admin data",admin);
+    if (!admin) {
+      return res.status(404).json({ message: "Data not found" });
+    }
+    return res.status(201).json({
+      message: "Profile fetched successfully",
+      admin,
+    });
+  }
+    catch (err) {
+    console.error("Profile fetch error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+);
+
+// Get grievances of logged-in student
 app.get("/api/grievances/my", authoriseUser, async (req, res) => {
   try {
     const user=req.user;
@@ -246,7 +299,7 @@ app.get("/api/grievances/my", authoriseUser, async (req, res) => {
 
     // Find grievances belonging to logged-in student
     const grievances = await Grievance.find({ registrationId: user.registrationId });
-
+console.log("All griencances from the student", grievances);
     return res.status(201).json({ data:grievances });
   } catch (err) {
     console.error("Fetch grievances error:", err);
@@ -254,12 +307,12 @@ app.get("/api/grievances/my", authoriseUser, async (req, res) => {
   }
 });
 
-// Add grievance API
+// Add grievance API for student
 app.post(
   "/api/grievances",
-  authoriseUser,
-  upload.array("images", 5), // Accept max 5 images uploaded with key "images"
-  async (req, res) => {
+    authoriseUser,
+      upload.array("images", 5), // Accept max 5 images uploaded with key "images"
+      async (req, res) => {
     try {
       const user=req.user;
       if(!user)
@@ -278,9 +331,12 @@ app.post(
 
       // Map uploaded files to image links (paths relative to server)
       const images = req.files ? req.files.map(file => ({ link: `/uploads/${file.filename}` })) : [];
-
-
+const currentStudent=await Student.findOne({registrationId:user.registrationId});
+if(!currentStudent){
+  return res.status(403).json({ message: "Access denied" });
+}
       const grievance = new Grievance({
+        hostelName: currentStudent.hostelName,
         registrationId: user.registrationId,
         title,
         description,
@@ -297,5 +353,91 @@ app.post(
     }
   }
 );
+
+//for admin to view all grievances in their hostel
+app.get("/all/greivances/admin", authoriseUser,async (req, res) => {
+  try {
+    const user=req.user;
+    if (!user) {
+      return res.status(403).json({ message: "Invalid request" });
+    }
+    const role=user.role;
+    if (role !== "admin") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    const staffId=user.staffId;
+    const admin=await Admin.findOne({staffId});
+    if(!admin){
+      return res.status(403).json({ message: "Access denied" });
+    }
+    const hostelName=admin.hostelName;
+    console.log("Hostel name of admin:",hostelName);
+    const grievances = await Grievance.find({hostelName});
+    return res.status(201).json({ data: grievances });
+  }
+  catch (err) {
+    console.error("Fetch all grievances error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+// showing specific grievance details to admin
+app.get("/grievance/:id", authoriseUser, async (req, res) => {
+  try {
+    const user=req.user;
+    if (!user) {
+      return res.status(403).json({ message: "Invalid request" });
+    }
+    const grievanceId = req.params.id;
+    const grievance = await Grievance.findOne
+      ({ _id: grievanceId });
+
+    if (!grievance) {
+      return res.status(404).json({ message: "Grievance not found" });
+    }
+
+    return res.status(201).json({ data: grievance });
+  } catch (err) {
+    console.error("Fetch grievance error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+// Update grievance status API for admin from pending to in-progress/resolved
+app.post("/grievance/:id/status", authoriseUser, async (req, res) => {
+  try {
+    const user=req.user;
+    if (!user) {
+      return res.status(403).json({ message: "Invalid request" });
+    }
+    const role=user.role;
+    if (role !== "admin") {
+      return res.status(403).json({ message: "Access denied" });
+    } 
+    const grievanceId = req.params.id;
+    const { status } = req.body;
+    const grievance = await Grievance.findByIdAndUpdate(
+      grievanceId,
+      { status }
+    );
+    if (!grievance) {
+      return res.status(404).json({ message: "Grievance not found" });
+    }
+    return res.status(201).json({ message: "Status updated successfully", grievance });
+  } catch (err) {
+
+    console.error("Update grievance status error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Global error handler
+
+app.use((req,res,err,next)=>{
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+  next();
+}); 
 
 app.listen(8080, () => console.log("🚀 Server running on port 8080"));

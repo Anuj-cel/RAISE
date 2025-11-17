@@ -6,23 +6,33 @@ import SearchBar from "./SearchBar";
 const RunningGrievances = () => {
   const [grievances, setGrievances] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchRunning();
+    fetchFiltered();
   }, []);
 
-  const fetchRunning = async () => {
+  // ✅ USE SAME ROUTE: /all/greivances/admin AND FILTER HERE
+  const fetchFiltered = async () => {
     try {
-      const res = await fetch("http://localhost:8080/admin/grievance/running");
+      const adminToken = localStorage.getItem("adminToken");
+
+      const res = await fetch("http://localhost:8080/all/greivances/admin", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
       const data = await res.json();
 
-      if (Array.isArray(data)) {
-        setGrievances(data);
-      } else {
-        console.error("Unexpected response:", data);
-      }
+      // Expecting data.data (array)
+      const list = Array.isArray(data.data) ? data.data : [];
+
+      // Filter only running
+      const runningOnly = list.filter((item) => item.status === "running");
+      setGrievances(runningOnly);
     } catch (error) {
       console.error("Error fetching running grievances:", error);
     }
@@ -32,9 +42,8 @@ const RunningGrievances = () => {
     navigate(`/admin/grievance/${id}`);
   };
 
-  // 🔍 FILTER BY STUDENT ID
   const filteredGrievances = grievances.filter((item) =>
-    item.student_id.toLowerCase().includes(searchTerm.toLowerCase())
+    item.registrationId?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -42,17 +51,11 @@ const RunningGrievances = () => {
       <AdminNavbar />
 
       <div style={{ padding: "20px" }}>
-        
-        {/* TITLE CENTERED */}
         <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
           Running Grievances
         </h2>
 
-        {/* SEARCH BAR */}
-        <SearchBar 
-          searchTerm={searchTerm} 
-          setSearchTerm={setSearchTerm} 
-        />
+        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
         <table
           style={{
@@ -63,7 +66,7 @@ const RunningGrievances = () => {
         >
           <thead>
             <tr style={{ background: "#f4f4f4" }}>
-              <th style={thStyle}>Student ID</th>
+              <th style={thStyle}>Registration ID</th>
               <th style={thStyle}>Category</th>
               <th style={thStyle}>Status</th>
               <th style={thStyle}>Date</th>
@@ -81,7 +84,7 @@ const RunningGrievances = () => {
             ) : (
               filteredGrievances.map((item) => (
                 <tr key={item._id}>
-                  <td style={tdStyle}>{item.student_id}</td>
+                  <td style={tdStyle}>{item.registrationId}</td>
                   <td style={tdStyle}>{item.category}</td>
                   <td style={tdStyle}>{item.status}</td>
                   <td style={tdStyle}>

@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const grievanceSchema = new mongoose.Schema({
   registrationId: { type: String, required: true },
+  hostelName: { type: String, required: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
   images: [

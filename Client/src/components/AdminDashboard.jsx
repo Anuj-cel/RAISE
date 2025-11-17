@@ -3,6 +3,11 @@ import { Link } from "react-router-dom";
 import AdminNavbar from "./AdminNavbar";
 
 export default function AdminDashboard() {
+  const adminToken=localStorage.getItem('adminToken');
+  if(!adminToken){
+    window.location.href="/login/admin";
+  }
+
   return (
     <div style={{ background: "#f5f6fa", minHeight: "100vh" }}>
       <AdminNavbar />

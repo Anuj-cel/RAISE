@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import AdminNavbar from "./AdminNavbar";
 import SearchBar from "./SearchBar";
 
-const AllGrievances = () => {
+const AllGrievancesAdmin = () => {
   const [grievances, setGrievances] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const adminToken = localStorage.getItem("adminToken");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,13 +15,25 @@ const AllGrievances = () => {
 
   const fetchGrievances = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/grievances/my");
-      const data = await res.json();
+      const res = await fetch("http://localhost:8080/all/greivances/admin", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const responseData = await res.json(); // Renamed to responseData
+      
+      console.log("Fetched grievances data:", responseData);
 
-      if (Array.isArray(data)) {
-        setGrievances(data);
+      // 🛑 ERROR FIX: The response is an object with a 'data' property that holds the array.
+      // We need to check the 'data' property of the response object.
+      if (responseData && Array.isArray(responseData.data)) {
+        setGrievances(responseData.data); // Set the state with the array inside 'data'
       } else {
-        console.error("Unexpected response:", data);
+        console.error("Unexpected response structure or non-array data:", responseData);
+        // If the 'data' property is missing or not an array, set to an empty array
+        setGrievances([]); 
       }
     } catch (error) {
       console.error("Error fetching grievances:", error);
@@ -33,8 +45,9 @@ const AllGrievances = () => {
   };
 
   // 🔍 FILTERED LIST USING SEARCH TERM
+  // 🛑 POTENTIAL ERROR FIX: Filtering should use 'registrationId' (from your log) instead of 'student_id'.
   const filteredGrievances = grievances.filter((item) =>
-    item.student_id.toLowerCase().includes(searchTerm.toLowerCase())
+    item.registrationId.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -42,7 +55,18 @@ const AllGrievances = () => {
       <AdminNavbar />
 
       <div style={{ padding: "20px" }}>
-        <h1 style={{ textAlign: "center" }}>All Grievance Requests</h1>
+<h2
+  style={{
+    textAlign: "center",
+    margin: "20px 0",
+    fontSize: "28px",
+    fontWeight: "600",
+    color: "#333",
+    letterSpacing: "0.5px",
+  }}
+>
+  All Grievance Requests
+</h2>
 
         {/* 🔍 SEARCH BAR */}
         <SearchBar 
@@ -59,7 +83,8 @@ const AllGrievances = () => {
         >
           <thead>
             <tr style={{ background: "#f4f4f4" }}>
-              <th style={thStyle}>Student ID</th>
+              {/* 🛑 UI TEXT CHANGE: Change header text to match the property used for ID */}
+              <th style={thStyle}>Registration ID</th> 
               <th style={thStyle}>Category</th>
               <th style={thStyle}>Status</th>
               <th style={thStyle}>Date</th>
@@ -77,7 +102,8 @@ const AllGrievances = () => {
             ) : (
               filteredGrievances.map((item) => (
                 <tr key={item._id}>
-                  <td style={tdStyle}>{item.student_id}</td>
+                  {/* 🛑 PROPERTY CHANGE: Display 'registrationId' */}
+                  <td style={tdStyle}>{item.registrationId}</td> 
                   <td style={tdStyle}>{item.category}</td>
                   <td style={tdStyle}>{item.status}</td>
                   <td style={tdStyle}>
@@ -119,4 +145,4 @@ const tdStyle = {
   border: "1px solid #ccc",
 };
 
-export default AllGrievances;
+export default AllGrievancesAdmin;

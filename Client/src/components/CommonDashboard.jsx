@@ -1,85 +1,125 @@
-
-import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { CheckCircle, MessageSquare, Clock, Shield } from 'lucide-react';
+import './commonDashboard.css';
 
 const CommonDashboard = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
 
-  // Add your hostel images here (place inside public/images/)
-  const images = [
-    "/images/hostel-1.png",
-    "/images/hostel-2.jpg",
-    "/images/hostel-3.jpg",
+  const slides = [
+    {
+      title: "Voice Your Concerns",
+      description: "A secure platform to raise and track your hostel grievances efficiently",
+      image: "/images/hostel-j.jpeg"
+    },
+    {
+      title: "Quick Resolution",
+      description: "Get your issues resolved faster with our streamlined grievance management system",
+      image: "/images/hostel-k.jpeg"
+    },
+    {
+      title: "24/7 Support",
+      description: "Submit grievances anytime, anywhere. We're here to help you round the clock",
+      image: "/images/hostel-l.png"
+    }
   ];
 
-  const [index, setIndex] = useState(0);
-
-  // Function to handle navigation to the Admin Login page
-  const goToAdminLogin = () => {
-    navigate("/login/admin");
-  };
-
-  // Function to handle navigation to the Student Login page
-  const goToStudentLogin = () => {
-    navigate("/login/student");
-  };
-
-  // Auto-slide every 4 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % images.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [images.length]);
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [slides.length]);
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden font-inter">
+    <div>
+      <nav className="navbar">
+        <div className="logo">🎓 Grievance Portal</div>
+        <div className="auth-buttons">
+          <button className="btn btn-student" onClick={()=>navigate('/login/student')}>Student Login</button>
+          <button className="btn btn-admin" onClick={()=>navigate('/login/admin')}>Admin Login</button>
+        </div>
+      </nav>
 
-      {/* Background Slideshow */}
-      <div className="absolute inset-0">
-        {images.map((img, i) => (
-          <img
-            key={i}
-            src={img}
-            alt="Hostel"
-            // Use a placeholder if the image fails to load
-            onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/1920x1080/4F46E5/FFFFFF?text=Hostel+View"; }}
-            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-1000 
-              ${i === index ? "opacity-100" : "opacity-0"}`}
-          />
-        ))}
-      </div>
+      <div className="container">
+        <div className="slider-section">
+          <div className="slider">
+            {slides.map((slide, index) => (
+              <div
+                key={index}
+                className={`slide ${index === currentSlide ? 'active' : ''}`}
+                style={{ backgroundImage: `url(${slide.image})` }}
+              >
+                <div className="slide-overlay">
+                  <div className="slide-content">
+                    <h2>{slide.title}</h2>
+                    <p>{slide.description}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-      {/* Dark Transparent Overlay */}
-      <div className="absolute inset-0 bg-black/60"></div>
+        <div className="content-section">
+          <p className="subtitle">
+            Making hostel life better, one resolution at a time. Register today to start managing your concerns effectively.
+          </p>
 
-      {/* Navigation Buttons (Top Right) */}
-      <div className="absolute top-6 right-6 z-30 space-x-4">
-        <button 
-          onClick={goToAdminLogin}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
-        >
-          Admin Login
-        </button>
-        <button 
-          onClick={goToStudentLogin}
-          className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
-        >
-          Student Login
-        </button>
-      </div>
+          <div className="features">
+            <div className="feature-item">
+              <div className="feature-icon">
+                <MessageSquare />
+              </div>
+              <div className="feature-text">
+                <h3>Easy Submission</h3>
+                <p>Submit your grievances with just a few clicks. Attach photos and provide detailed descriptions.</p>
+              </div>
+            </div>
 
-      {/* Foreground Content (Centered) */}
-      <div className="relative text-center text-white z-20 p-8 bg-gray-900/40 rounded-xl backdrop-blur-sm shadow-2xl">
-        <h1 className="text-5xl md:text-6xl font-extrabold mb-4 tracking-tight">
-          Hostel Grievance Redressal System
-        </h1>
-        <p className="text-xl md:text-2xl font-light opacity-80 mt-2">
-          Simplifying the process for students and administrators.
-        </p>
+            <div className="feature-item">
+              <div className="feature-icon">
+                <Clock />
+              </div>
+              <div className="feature-text">
+                <h3>Real-time Tracking</h3>
+                <p>Track the status of your complaints in real-time and receive instant notifications on updates.</p>
+              </div>
+            </div>
+
+            <div className="feature-item">
+              <div className="feature-icon">
+                <CheckCircle />
+              </div>
+              <div className="feature-text">
+                <h3>Transparent Process</h3>
+                <p>Complete transparency throughout the resolution process with regular status updates.</p>
+              </div>
+            </div>
+
+            <div className="feature-item">
+              <div className="feature-icon">
+                <Shield />
+              </div>
+              <div className="feature-text">
+                <h3>Secure & Confidential</h3>
+                <p>Your privacy is our priority. All submissions are secure and handled confidentially.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="cta-section">
+            <button className="btn btn-register" onClick={()=>navigate('/register/student')}>Start Now</button>
+            <p className="info-text">
+              Already have an account? Use the login buttons above to access your dashboard.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
-};
+}
 
 export default CommonDashboard;

@@ -160,7 +160,7 @@ app.post("/login/student", async (req, res) => {
       student,
     });
   } catch (err) {
-    console.error("Student login error:", err);
+    // console.error("Student login error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
@@ -255,6 +255,34 @@ app.get("/profile/admin", authoriseUser, async (req, res) => {
   }
 });
 
+
+app.get("/profile/admin", authoriseUser, async (req, res) => {
+  try {
+    const user=req.user;
+    if(!user)
+      return res.status(403).json({message: "Invalid request"});
+    const role=user.role;
+    if (role !== "admin") {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
+console.log("This is user data",user);
+   const admin = await Admin.findOne({staffId:user.staffId});
+   console.log("This is admin data",admin);
+    if (!admin) {
+      return res.status(404).json({ message: "Data not found" });
+    }
+    return res.status(201).json({
+      message: "Profile fetched successfully",
+      admin,
+    });
+  }
+    catch (err) {
+    console.error("Profile fetch error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+);
+
 // Get grievances of logged-in student
 app.get("/api/grievances/my", authoriseUser, async (req, res) => {
   try {
@@ -282,9 +310,9 @@ console.log("All griencances from the student", grievances);
 // Add grievance API for student
 app.post(
   "/api/grievances",
-  authoriseUser,
-  upload.array("images", 5), // Accept max 5 images uploaded with key "images"
-  async (req, res) => {
+    authoriseUser,
+      upload.array("images", 5), // Accept max 5 images uploaded with key "images"
+      async (req, res) => {
     try {
       const user=req.user;
       if(!user)
@@ -327,7 +355,7 @@ if(!currentStudent){
 );
 
 //for admin to view all grievances in their hostel
-app.get("/all/greivances", authoriseUser,async (req, res) => {
+app.get("/all/greivances/admin", authoriseUser,async (req, res) => {
   try {
     const user=req.user;
     if (!user) {
@@ -343,6 +371,7 @@ app.get("/all/greivances", authoriseUser,async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
     const hostelName=admin.hostelName;
+    console.log("Hostel name of admin:",hostelName);
     const grievances = await Grievance.find({hostelName});
     return res.status(201).json({ data: grievances });
   }
@@ -360,7 +389,7 @@ app.get("/grievance/:id", authoriseUser, async (req, res) => {
       return res.status(403).json({ message: "Invalid request" });
     }
     const grievanceId = req.params.id;
-    const grievance = await Grievance.find
+    const grievance = await Grievance.findOne
       ({ _id: grievanceId });
 
     if (!grievance) {

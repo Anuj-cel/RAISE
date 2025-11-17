@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-
+import StudentNavbar from "./StudentNavbar";
 const MyGrievances = ({ token }) => {
   const [grievances, setGrievances] = useState([]);
   const navigate=useNavigate();
@@ -9,7 +9,6 @@ const MyGrievances = ({ token }) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Please login first!");
         navigate('login/student');
         return;
       }
@@ -30,7 +29,8 @@ const MyGrievances = ({ token }) => {
     fetchGrievances();
   }, []);
 
-  return (
+  return (<>
+    <StudentNavbar />
     <div className="bg-white p-4 rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-4">My Grievances</h2>
 
@@ -47,7 +47,7 @@ const MyGrievances = ({ token }) => {
               <span
                 className={`px-3 py-1 rounded text-sm font-semibold ${
                   g.status === "pending"
-                    ? "bg-yellow-500 text-white"
+                  ? "bg-yellow-500 text-white"
                     : g.status === "done"
                     ? "bg-green-600 text-white"
                     : "bg-gray-400 text-white"
@@ -77,6 +77,7 @@ const MyGrievances = ({ token }) => {
         ))
       )}
     </div>
+        </>
   );
 };
 

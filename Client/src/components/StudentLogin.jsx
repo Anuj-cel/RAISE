@@ -113,6 +113,11 @@ const StudentLogin = () => {
             <Link to="/register/student" className="ml-1 font-medium text-indigo-600 hover:text-indigo-500">
                 Register Here
             </Link>
+        <p>
+                <Link to="/" className="font-medium text-gray-500 hover:text-indigo-600">
+                    &larr; Back to Role Selection
+                </Link>
+            </p>
         </div>
       </div>
     </div>

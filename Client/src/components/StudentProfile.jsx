@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
+import StudentNavbar from "./StudentNavbar";
 
 export default function StudentProfile() {
   const [student, setStudent] = useState(null);
   const [error, setError] = useState("");
 const token = localStorage.getItem("token");
-    const userRole = localStorage.getItem("role");
+if(!token){
+  window.location.href="/login/student";
+}
+    // const userRole = localStorage.getItem("role");
   const getStudentData = async () => {
     console.log("Get student data is called")
     try {
@@ -66,6 +70,8 @@ const token = localStorage.getItem("token");
   const avatarColor = colors[colorIndex];
 
   return (
+    <>
+    <StudentNavbar/>
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-8">
       <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-3xl">
 
@@ -135,5 +141,6 @@ const token = localStorage.getItem("token");
         </div>
       </div>
     </div>
+    </>
   );
 }
